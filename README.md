@@ -30,6 +30,7 @@ Under the Paylike payment method settings, you can:
  * Set payment mode (test/live)
  * Change the capture type (Instant/Delayed) 
  
+**Make sure to clear the cache after any setting update** 
 ## How to
   
 1. Capture
