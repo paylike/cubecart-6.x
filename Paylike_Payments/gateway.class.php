@@ -164,6 +164,7 @@ class Gateway {
                       }
                       
                       if($cap['successful']&&$cap['capturedAmount']) {
+                        $order->orderStatus(Order::ORDER_COMPLETE, $orderid);
                         $transData['status'] = 'Captured';
                         $transData['notes'][] = $this->_lang['captured'];
                       }

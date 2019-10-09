@@ -14,13 +14,12 @@ Released under the GPL V3 license: https://opensource.org/licenses/GPL-3.0
 
 ## Installation
 
-Once you have installed Cubecart, follow these simple steps:
-  1. Signup at (paylike.io) [https://paylike.io] (it’s free)
-  1. Create a live account
-  1. Create an app key for your Cubecart website
-  1. Download the `Paylike_Payments.zip` file from the releases or from this repository and unzip it
-  1. Upload the `Paylike_Payments` folder to the `modules\plugins` folder
-  1. Insert Paylike API keys, from https://app.paylike.io to the extension settings page you can find under the available extensions section in your admin.
+1.Once you have installed Cubecart, follow these simple steps:
+  Signup at (paylike.io) [https://paylike.io] (it’s free)
+     1. Create a live account
+     1. Create an app key for your Cubecart website
+     1. Upload the `Paylike_Payments` folder to the `modules\plugins` folder
+     1. Insert Paylike API keys, from https://app.paylike.io to the extension settings page you can find under the available extensions section in your admin.
      
 ## Updating settings
 
