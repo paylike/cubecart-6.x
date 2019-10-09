@@ -19,7 +19,6 @@
 	<hook trigger="class.cubecart.display_gateways" enabled="1"><![CDATA[Display Paylike Gateway on Checkout]]></hook>
     <hook trigger="class.cubecart.construct.callback.gateway" enabled="1"><![CDATA[Callback Handler]]></hook>
     <hook trigger="admin.order.index.post_process" enabled="1"><![CDATA[Capture Payment when Order Status is Complete]]></hook>
-    <hook trigger="class.gui.body_js" enabled="1"><![CDATA[Include Paylike Checkout Script]]></hook>
     <hook trigger="admin.order.index.display" enabled="1"><![CDATA[Refund/Void Button for Orders]]></hook>
     <hook trigger="admin.tabs" enabled="1"><![CDATA[Refund/Void Tab for Paylike Orders]]></hook>
   </hooks>
