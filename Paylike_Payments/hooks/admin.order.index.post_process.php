@@ -20,12 +20,12 @@ if($record['cart_order_id']) {
           // load module vars
           $modcfg = $GLOBALS['config']->get('Paylike_Payments');
           $modlang = $GLOBALS['language']->getStrings('paylike_text');
-          
+
           // create a new transaction log
           $newlog = $txns[0];
           unset($newlog['id']);
           $newlog['notes'] = array();
-          
+
           // set app key
           $appkey = $modcfg['livekey_app'];
           if($modcfg['mode']=='test') {
@@ -36,12 +36,13 @@ if($record['cart_order_id']) {
           require_once(CC_ROOT_DIR.'/modules/plugins/Paylike_Payments/api/init.php');
           $paylike = new \Paylike\Paylike($appkey);
           $transactions = $paylike->transactions();
-          
+          $order = Order::getInstance();
+          $order_summary = $order->getSummary($record['cart_order_id']);
           try {
             $res = $transactions->capture(
-              $txns[0]['trans_id'], 
+              $txns[0]['trans_id'],
               array(
-                'amount'=>get_paylike_amount($txns[0]['amount'], $storeCurrency),
+                'amount'=>get_paylike_amount($txns[0]['amount'], $order_summary["currency"]),
                 'descriptor'=>substr(preg_replace("/[^\x20-\x7e]/", "", $GLOBALS['config']->get('config','store_name')),0,22)
               )
             );
@@ -73,7 +74,7 @@ if($record['cart_order_id']) {
             // Unknown api error
             $newlog['notes'][] = $e->message;
           }
-          
+
           if($res['successful']) {
             $newlog['notes'][] = $modlang['captured'];
             $GLOBALS['main']->successMessage($modlang['captured']);
@@ -117,12 +118,14 @@ if(isset($GLOBALS['_POST']['confirmplvoid'])&&$GLOBALS['_POST']['confirmplvoid']
       require_once(CC_ROOT_DIR.'/modules/plugins/Paylike_Payments/api/init.php');
       $paylike = new \Paylike\Paylike($appkey);
       $transactions = $paylike->transactions();
+      $order = Order::getInstance();
+      $order_summary = $order->getSummary($record['cart_order_id']);
 
       try {
         $void = $transactions->void(
           $txns[0]['trans_id'],
           array(
-            'amount'=>get_paylike_amount($txns[0]['amount'], $storeCurrency)
+            'amount'=>get_paylike_amount($txns[0]['amount'], $order_summary["currency"])
           )
         );
       } catch (\Paylike\Exception\NotFound $e) {
@@ -195,12 +198,13 @@ if(isset($GLOBALS['_POST']['confirmplrefund'])&&$GLOBALS['_POST']['confirmplrefu
       require_once(CC_ROOT_DIR.'/modules/plugins/Paylike_Payments/api/init.php');
       $paylike = new \Paylike\Paylike($appkey);
       $transactions = $paylike->transactions();
-      
+      $order = Order::getInstance();
+      $order_summary = $order->getSummary($record['cart_order_id']);
       try {
         $rfd = $transactions->refund(
-          $txns[0]['trans_id'], 
+          $txns[0]['trans_id'],
           array(
-            'amount'=>get_paylike_amount($txns[0]['amount'], $storeCurrency)
+            'amount'=>get_paylike_amount($txns[0]['amount'],$order_summary["currency"])
           )
         );
       } catch (\Paylike\Exception\NotFound $e) {
