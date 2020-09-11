@@ -36,9 +36,12 @@ if (is_object($xml)) {
   }
 }
 
+$clientCurrency = $GLOBALS['tax']->_currency_vars;
+$clientTotal = round($GLOBALS['cart']->getTotal() * $clientCurrency['value'], $clientCurrency['decimal_places']);
+
 $paylikejs['title'] = $GLOBALS['config']->get('config','store_name');
-$paylikejs['currency'] = $storeCurrency;
-$paylikejs['amount'] = get_paylike_amount($GLOBALS['cart']->getTotal(), $storeCurrency);
+$paylikejs['currency'] = $clientCurrency['code'];
+$paylikejs['amount'] = get_paylike_amount($clientTotal, $clientCurrency['code']);
 $paylikejs['locale'] = $GLOBALS['config']->get('config','default_language');
 
 $paylikejs['address_defined'] = false;
