@@ -5,7 +5,7 @@ class Gateway {
 	private $_basket;
     private $_lang;
 	private $_result_message;
-  
+
     public function __construct($module = false, $basket = false) {
 		$this->_config	= $GLOBALS['config']->get('config');
 		$this->_module	= $module;
@@ -13,7 +13,7 @@ class Gateway {
         $GLOBALS['language']->loadDefinitions('paylike_text', CC_ROOT_DIR.'/modules/plugins/Paylike_Payments/language', 'module.definitions.xml');
 		$this->_lang = $GLOBALS['language']->getStrings('paylike_text');
 	}
-  
+
     public function transfer() {
 		$transfer	= array(
 			'action'	=> 'index.php?_g=rm&type=plugins&cmd=call&module=Paylike_Payments&cart_order_id='.$this->_basket['cart_order_id'],
@@ -23,7 +23,7 @@ class Gateway {
 		);
 		return $transfer;
 	}
-  
+
     public function call() {
       $GLOBALS['gui']->changeTemplateDir(dirname(__FILE__).'/'.'skin/');
 
@@ -40,26 +40,26 @@ class Gateway {
         $GLOBALS['smarty']->display('redirect.tpl');
       }
     }
-  
+
     public function process() {
-      if((isset($_GET['orderid'])&&$_GET['orderid'])&&(isset($_GET['transactionid'])&&$_GET['transactionid'])) { 
+      if((isset($_GET['orderid'])&&$_GET['orderid'])&&(isset($_GET['transactionid'])&&$_GET['transactionid'])) {
         $orderid = sanitizeVar($_GET['orderid']);
         $transactionid = sanitizeVar($_GET['transactionid']);
-        
+
         $order				= Order::getInstance();
         $order_summary		= $order->getSummary($orderid);
-        
+
         // txn log
         $transData = array();
         $transData['status'] = 'Pending';
-		$transData['trans_id'] = $transactionid;
-		$transData['order_id'] = $orderid;
-		$transData['amount'] = sprintf("%.2f",$order_summary["total"]);
-		$transData['customer_id'] = $order_summary["customer_id"];
-		//$transData['gateway'] = $this->_module['name'];
+        $transData['trans_id'] = $transactionid;
+        $transData['order_id'] = $orderid;
+        $transData['amount'] = sprintf("%.2f",$order_summary["total"]);
+        $transData['customer_id'] = $order_summary["customer_id"];
+        //$transData['gateway'] = $this->_module['name'];
         $transData['gateway'] = "Paylike_Payments";
         $transData['notes'] = array();
-        
+
         $confirmed = false;
         if($order_summary['status']=='1') {
 
@@ -73,7 +73,7 @@ class Gateway {
             require_once(__DIR__.'/api/init.php');
             $paylike = new \Paylike\Paylike($appkey);
             $transactions = $paylike->transactions();
-            
+
             // fetch transaction
             $res = false;
             try {
@@ -106,7 +106,7 @@ class Gateway {
               // Unknown api error
               $transData['notes'][] = $e->message;
             }
-            
+
 
 
             if($res) {
@@ -116,13 +116,13 @@ class Gateway {
                     if($res['test']) {
                       $transData['notes'][] = $this->_lang['uselive'];
                     }
-                    
+
                     // payment successful, set order&payment status
                     $order->paymentStatus(Order::PAYMENT_SUCCESS, $orderid);
                     $order->orderStatus(Order::ORDER_PROCESS, $orderid);
                     $transData['notes'][] = $this->_lang['paysuccess'];
                     if($res['pendingAmount']) { $transData['status'] = 'Authorized'; }
-                    
+
                     // instant capture
                     if($this->_module['capturemode']=='instant') {
                       // include currency handling
@@ -131,7 +131,7 @@ class Gateway {
                       $cap = array('successful'=>false,'capturedAmount'=>0);
                       try {
                         $cap = $transactions->capture($transactionid,array(
-                          'amount' => get_paylike_amount($order_summary["total"], $storeCurrency),
+                          'amount' => get_paylike_amount($order_summary["total"], $order_summary["currency"]),
                           'descriptor' => substr(preg_replace("/[^\x20-\x7e]/", "", $GLOBALS['config']->get('config','store_name')),0,22)
                         ));
                       } catch (\Paylike\Exception\NotFound $e) {
@@ -162,20 +162,20 @@ class Gateway {
                         // Unknown api error
                         $transData['notes'][] = $e->message;
                       }
-                      
+
                       if($cap['successful']&&$cap['capturedAmount']) {
                         $order->orderStatus(Order::ORDER_COMPLETE, $orderid);
                         $transData['status'] = 'Captured';
                         $transData['notes'][] = $this->_lang['captured'];
                       }
                     }
-                    
-                    
+
+
                     // unset txnid for popup payments
                     if(isset($_SESSION['paylike_token'])) { unset($_SESSION['paylike_token']); }
-                    
+
                     $confirmed = true;
-                    
+
                   } else {
                     $transData['notes'][] = $this->_lang['amountmismatch'];
                   }
@@ -199,28 +199,28 @@ class Gateway {
             }
           }
         }
-        
+
         // transactionid already exists?
         $trans_id	= $GLOBALS['db']->select('CubeCart_transactions', array('id'), array('trans_id' => $transactionid));
         if ($trans_id) {
             $transData['notes'][]	= $this->_lang['txn_exists'];
         }
-        
+
         // Log transaction
         $order->logTransaction($transData);
-        
+
         // Everythings good, continue to page 'complete'
         if($confirmed) {
           httpredir(currentPage(array('_g', 'type', 'cmd', 'module', 'transactionid', 'orderid'), array('_a' => 'complete')));
           return true;
-        } 
-        
+        }
+
         // Unknown errors
         $GLOBALS['main']->errorMessage($GLOBALS['language']->paylike_text['error_unknown']);
         httpredir(currentPage(array('_g', 'type', 'cmd', 'module', 'transactionid', 'orderid'), array('_a' => 'checkout')));
         return false;
       }
-      
+
       // OrderID/TxnID missing
       $GLOBALS['main']->errorMessage($GLOBALS['language']->paylike_text['idsmissing']);
       httpredir(currentPage(array('_g', 'type', 'cmd', 'module', 'transactionid', 'orderid'), array('_a' => 'checkout')));
