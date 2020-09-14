@@ -37,12 +37,11 @@ if($record['cart_order_id']) {
           $paylike = new \Paylike\Paylike($appkey);
           $transactions = $paylike->transactions();
           $order = Order::getInstance();
-          $order_summary = $order->getSummary($record['cart_order_id']);
           try {
             $res = $transactions->capture(
               $txns[0]['trans_id'],
               array(
-                'amount'=>get_paylike_amount($txns[0]['amount'], $order_summary["currency"]),
+                'amount'=>get_paylike_amount($txns[0]['amount'], $order->getSummary($record['cart_order_id'])["currency"]),
                 'descriptor'=>substr(preg_replace("/[^\x20-\x7e]/", "", $GLOBALS['config']->get('config','store_name')),0,22)
               )
             );
@@ -119,13 +118,11 @@ if(isset($GLOBALS['_POST']['confirmplvoid'])&&$GLOBALS['_POST']['confirmplvoid']
       $paylike = new \Paylike\Paylike($appkey);
       $transactions = $paylike->transactions();
       $order = Order::getInstance();
-      $order_summary = $order->getSummary($record['cart_order_id']);
-
       try {
         $void = $transactions->void(
           $txns[0]['trans_id'],
           array(
-            'amount'=>get_paylike_amount($txns[0]['amount'], $order_summary["currency"])
+            'amount'=>get_paylike_amount($txns[0]['amount'], $order->getSummary($record['cart_order_id'])["currency"])
           )
         );
       } catch (\Paylike\Exception\NotFound $e) {
@@ -199,12 +196,11 @@ if(isset($GLOBALS['_POST']['confirmplrefund'])&&$GLOBALS['_POST']['confirmplrefu
       $paylike = new \Paylike\Paylike($appkey);
       $transactions = $paylike->transactions();
       $order = Order::getInstance();
-      $order_summary = $order->getSummary($record['cart_order_id']);
       try {
         $rfd = $transactions->refund(
           $txns[0]['trans_id'],
           array(
-            'amount'=>get_paylike_amount($txns[0]['amount'],$order_summary["currency"])
+            'amount'=>get_paylike_amount($txns[0]['amount'], $order->getSummary($record['cart_order_id'])["currency"])
           )
         );
       } catch (\Paylike\Exception\NotFound $e) {

@@ -1101,9 +1101,9 @@ $storeCurrency = $GLOBALS['config']->get('config','default_currency');
  * @return array|false
  */
 function getCurrecyVars($code = null){
-  $_storeCurrency = $GLOBALS['config']->get('config','default_currency');
+  /** If no currency is provided, extract default one. */
   if ( '' == $code ) {
-      $code = $_storeCurrency;
+      $code = $GLOBALS['config']->get('config','default_currency');
   }
   if (($result = $GLOBALS['db']->select('CubeCart_currency', '*', array('code' => $code))) !== false) {
       return $result[0];
