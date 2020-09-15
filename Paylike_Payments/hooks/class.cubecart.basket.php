@@ -1,6 +1,7 @@
 <?php
 if(!defined('CC_INI_SET')) die('Access Denied');
 
+
 //include currency handling
 require 'modules/plugins/Paylike_Payments/currencies.php';
 
@@ -36,9 +37,15 @@ if (is_object($xml)) {
   }
 }
 
+if ($GLOBALS['session']->has('currency', 'client')) {
+    $clientCurrency = $GLOBALS['session']->get('currency', 'client');
+} else {
+    $clientCurrency = $storeCurrency;
+}
+
 $paylikejs['title'] = $GLOBALS['config']->get('config','store_name');
-$paylikejs['currency'] = $storeCurrency;
-$paylikejs['amount'] = get_paylike_amount($GLOBALS['cart']->getTotal(), $storeCurrency);
+$paylikejs['currency'] = $clientCurrency;
+$paylikejs['amount'] = get_paylike_amount($GLOBALS['cart']->getTotal(), $clientCurrency);
 $paylikejs['locale'] = $GLOBALS['config']->get('config','default_language');
 
 $paylikejs['address_defined'] = false;
@@ -61,4 +68,3 @@ if(isset($GLOBALS['cart']->basket['billing_address']['user_defined'])) {
 $content .= '<script type="text/javascript">var cc_paylike_params = '.json_encode($paylikejs).';</script>
 <script src="modules/plugins/Paylike_Payments/skin/scripts/paylike_checkout.js"></script>
 <script src="https://sdk.paylike.io/3.js"></script>';
-

@@ -1094,6 +1094,24 @@ function get_paylike_currency( $currency_iso_code ) {
 $storeCurrency = $GLOBALS['config']->get('config','default_currency');
 
 /**
+ * Return store currency values {code,value,default_currency}
+ *
+ * @param $code|string - currency code e.g. "EUR"
+ *
+ * @return array|false
+ */
+function getCurrecyVars($code = null){
+  /** If no currency is provided, extract default one. */
+  if ( '' == $code ) {
+      $code = $GLOBALS['config']->get('config','default_currency');
+  }
+  if (($result = $GLOBALS['db']->select('CubeCart_currency', '*', array('code' => $code))) !== false) {
+      return $result[0];
+  }
+  return false;
+}
+
+/**
  * Return the number that should be used to compute cents from the total amount
  *
  * @param $currency_iso_code
@@ -1117,10 +1135,18 @@ function get_paylike_currency_multiplier( $currency_iso_code ) {
  * @return string
  */
 function get_paylike_amount( $total, $currency = null ) {
-  global $storeCurrency;
+    $_storeCurrency = $GLOBALS['config']->get('config','default_currency');
     if ( '' == $currency ) {
-        $currency = $storeCurrency;
+        $currency = $_storeCurrency;
     }
+
+    /* Do currency conversion if different then store currency */
+    if($currency != $_storeCurrency){
+      $currency_vars = getCurrecyVars($currency);
+      if($currency_vars)
+        $total = round($total * $currency_vars['value'], $currency_vars['decimal_places']);
+    }
+
     $multiplier = get_paylike_currency_multiplier( $currency );
     $amount     = ceil( $total * $multiplier ); // round to make sure we are always minor units.
     if ( function_exists( 'bcmul' ) ) {
