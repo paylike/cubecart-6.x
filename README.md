@@ -1,4 +1,4 @@
-# Cubecart plugin for Paylike
+# Cubecart plugin for Paylike [![Build Status](https://travis-ci.com/ionutcalara/cubecart-6.x.svg?branch=master)](https://travis-ci.com/github/ionutcalara/cubecart-6.x)
 
 This plugin is *not* developed or maintained by Paylike but kindly made
 available by a user.
@@ -7,10 +7,9 @@ Released under the GPL V3 license: https://opensource.org/licenses/GPL-3.0
 
 ## Supported Cubecart versions
 
-*The plugin has been tested with most versions of Cubecart at every iteration. We recommend using the latest version of Cubecart, but if that is not possible for some reason, test the plugin with your Cubecart version and it would probably function properly.*
+[![Last succesfull test](https://log.derikon.ro/api/v1/log/read?tag=cubecart&view=svg&label=Cubecart&key=ecommerce&background=69b9ce)](https://log.derikon.ro/api/v1/log/read?tag=cubecart&view=html)
 
-* Cubecart
- version last tested on: *6.2.6* 
+*The plugin has been tested with most versions of Cubecart at every iteration. We recommend using the latest version of Cubecart, but if that is not possible for some reason, test the plugin with your Cubecart version and it would probably function properly.* 
 
 ## Installation
 

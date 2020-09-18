@@ -24,7 +24,7 @@ ADMIN_PREFIX="admin251j3cm2b"
 
 3. Start the testing server. See
 [Steward readme page](https://github.com/lmc-eu/steward#4-run-your-tests)
-4. Run  ./vendor/bin/steward run staging chrome --group="thirtybees_test" -vv for the short test
+4. Run  ./vendor/bin/steward run staging chrome --group="cubecart_test" -vv for the short test
 5. Run  ./vendor/bin/steward run staging chrome -vv to go trough all the available tests.
 
 ## Problems
