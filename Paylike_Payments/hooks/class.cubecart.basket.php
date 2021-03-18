@@ -67,4 +67,4 @@ if(isset($GLOBALS['cart']->basket['billing_address']['user_defined'])) {
 
 $content .= '<script type="text/javascript">var cc_paylike_params = '.json_encode($paylikejs).';</script>
 <script src="modules/plugins/Paylike_Payments/skin/scripts/paylike_checkout.js"></script>
-<script src="https://sdk.paylike.io/3.js"></script>';
+<script src="https://sdk.paylike.io/6.js"></script>';
