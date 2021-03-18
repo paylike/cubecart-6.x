@@ -6,7 +6,7 @@
 	<mobile_optimized>true</mobile_optimized>
 	<name><![CDATA[Paylike]]></name>
 	<description><![CDATA[Paylike Popup Payments]]></description>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<minVersion>6.0.0</minVersion>
 	<maxVersion>6.*.*</maxVersion>
 	<creator><![CDATA[Ozgur Arslan]]></creator>
