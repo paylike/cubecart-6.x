@@ -9,7 +9,10 @@ Released under the GPL V3 license: https://opensource.org/licenses/GPL-3.0
 
 [![Last succesfull test](https://log.derikon.ro/api/v1/log/read?tag=cubecart&view=svg&label=Cubecart&key=ecommerce&background=69b9ce)](https://log.derikon.ro/api/v1/log/read?tag=cubecart&view=html)
 
-*The plugin has been tested with most versions of Cubecart at every iteration. We recommend using the latest version of Cubecart, but if that is not possible for some reason, test the plugin with your Cubecart version and it would probably function properly.* 
+*The plugin has been tested with most versions of Cubecart at every iteration. We recommend using the latest version of Cubecart, but if that is not possible for some reason, test the plugin with your Cubecart version and it would probably function properly.*
+
+* The plugin has been tested with:
+   - Cubecart up to version 6.4.4
 
 ## Installation
 
@@ -41,4 +44,15 @@ Under the Paylike payment method settings, you can:
 3. Void
 * All non captured orders will have a `Void` tab you can use for the void
    
+## Available features
+  
+1. Capture
+* Cubecart admin panel: full capture
+* Paylike admin panel: full/partial capture
+2. Refund
+* Cubecart admin panel: full refund
+* Paylike admin panel: full/partial refund
+3. Void
+* Cubecart admin panel: full void
+* Paylike admin panel: full/partial void
      
