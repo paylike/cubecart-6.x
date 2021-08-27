@@ -124,11 +124,18 @@ jQuery(function ($) {
                     var phoneNo = cc_paylike_form.getPhoneNo();
                     var address = cc_paylike_form.getAddress();
                     var eMail = cc_paylike_form.getEmail();
-                    var paylike = Paylike(cc_paylike_params.key);
+
+                    /** Initialize Paylike object. */
+                    var paylike = Paylike({key: cc_paylike_params.key});
+
                     var args = {
+                        test: ('test' == cc_paylike_params.test_mode) ? (true) : (false),
                         title: cc_paylike_params.title,
-                        currency: cc_paylike_params.currency,
-                        amount: cc_paylike_params.amount,
+                        amount: {
+                            currency: cc_paylike_params.currency,
+                            exponent: cc_paylike_params.exponent,
+                            value: cc_paylike_params.amount
+                        },
                         locale: cc_paylike_params.locale,
                         custom: {
                             email: eMail,
@@ -158,7 +165,7 @@ jQuery(function ($) {
                         delete args.currency;
                     }
 
-                    paylike.popup(args,
+                    paylike.pay(args,
                         function (err, res) {
                           if(err=='closed') { return false; }
                           if (res.transaction) {

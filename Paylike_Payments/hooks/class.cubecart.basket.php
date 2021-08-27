@@ -43,9 +43,11 @@ if ($GLOBALS['session']->has('currency', 'client')) {
     $clientCurrency = $storeCurrency;
 }
 
+$paylikejs['test_mode'] = $modcfg['mode'];
 $paylikejs['title'] = $GLOBALS['config']->get('config','store_name');
 $paylikejs['currency'] = $clientCurrency;
-$paylikejs['amount'] = get_paylike_amount($GLOBALS['cart']->getTotal(), $clientCurrency);
+$paylikejs['amount'] = (int)(get_paylike_amount($GLOBALS['cart']->getTotal(), $clientCurrency));
+$paylikejs['exponent'] = get_paylike_currency($clientCurrency)['exponent'];
 $paylikejs['locale'] = $GLOBALS['config']->get('config','default_language');
 
 $paylikejs['address_defined'] = false;
@@ -67,4 +69,4 @@ if(isset($GLOBALS['cart']->basket['billing_address']['user_defined'])) {
 
 $content .= '<script type="text/javascript">var cc_paylike_params = '.json_encode($paylikejs).';</script>
 <script src="modules/plugins/Paylike_Payments/skin/scripts/paylike_checkout.js"></script>
-<script src="https://sdk.paylike.io/6.js"></script>';
+<script src="https://sdk.paylike.io/10.js"></script>';
