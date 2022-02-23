@@ -13,11 +13,11 @@ export var TestMethods = {
 
     /** Construct some variables to be used bellow. */
     ShopName: 'cubecart',
-    PaylikeName: 'paylike',
+    PaylikeName: 'Paylike', // with first capital
     CheckoutUrl: '/index.php?_a=checkout',
-    // ShopAdminUrl: '/commerce/config/currency', // used for change currency
     PaymentMethodsAdminUrl: '?_g=plugins&type=plugins&module=Paylike_Payments',
     OrdersPageAdminUrl: '?_g=orders',
+    PluginsPageAdminUrl: '?_g=plugins',
 
     /**
      * Login to admin backend account
@@ -84,7 +84,7 @@ export var TestMethods = {
         cy.goToPage(this.StoreUrl + this.CheckoutUrl);
 
         /** Choose Paylike. */
-        cy.get('input[id=Paylike_Payments]').click();
+        cy.get(`input[id*=${this.PaylikeName}]`).click();
 
         /** Get & Verify amount. */
         cy.get('#content_checkout_medium_up td').contains('Grand Total').next().then($grandTotal => {
@@ -118,7 +118,7 @@ export var TestMethods = {
         cy.goToPage(this.OrdersPageAdminUrl);
 
         /** Click on first (latest in time) order from orders table. */
-        cy.get('.commerce-order-payment a').first().click();
+        cy.get('#orders tbody a').first().click();
 
         /**
          * Take specific action on order
@@ -134,40 +134,28 @@ export var TestMethods = {
      paylikeActionOnOrderAmount(paylikeAction, partialAmount = false) {
         switch (paylikeAction) {
             case 'capture':
-                /** Capture transaction. */
-                cy.get('.commerce-payment-transaction-capture a').click();
-                if (partialAmount) {
-                    cy.get('#edit-amount').then($editAmountInput => {
-                        var totalAmount = $editAmountInput.val();
-                        /** Subtract 10 major units from amount. */
-                        $editAmountInput.val(Math.round(totalAmount - 10));
-                    });
-                }
-                cy.get('#edit-submit').click();
+                /** Change order status and submit. */
+                cy.selectOptionContaining('select[name="order[status]"]', 'Order Complete');
                 break;
             case 'refund':
+                /** Select refund tab. */
+                cy.get('#tab_plrefund').click();
                 /** Refund transaction. */
-                cy.get('.commerce-payment-transaction-refund a').click();
-                if (partialAmount) {
-                    cy.get('#edit-amount').then($editAmountInput => {
-                        /**
-                         * Put 15 major units to be refunded.
-                         * Premise: any product must have price >= 15.
-                         */
-                        $editAmountInput.val(15);
-                    });
-                }
-                cy.get('#edit-submit').click();
+                cy.get('img[rel="#confirmplrefund"]').click();
                 break;
             case 'void':
+                /** Select void tab. */
+                cy.get('#tab_plvoid').click();
                 /** Void transaction. */
-                cy.get('.commerce-payment-transaction-void a').click();
-                cy.get('#edit-submit').click();
+                cy.get('img[rel="#confirmplvoid"]').click();
                 break;
         }
 
+        /** Trigger selected action. */
+        cy.get('input[value=Save]').click();
+
         /** Check if success message. */
-        cy.get('.views-row-last .views-field-message').should('contain', 'succeeded');
+        cy.get('#gui_message .success:nth-child(2)').should('be.visible');
     },
 
     /**
@@ -187,42 +175,37 @@ export var TestMethods = {
      * Get Shop & Paylike versions and send log data.
      */
     logVersions() {
-        /** Go to Virtuemart config page. */
-        cy.goToPage(this.ModulesAdminUrl);
+        /** From admin dashboard click on "Store Overview" tab. */
+        cy.get('a[href="#advanced"]').click();
 
         /** Get framework version. */
-        cy.get('#edit-modules-core tbody tr').first().then($frameworkVersion => {
-            var frameworkVersion = $frameworkVersion.children('td:nth-child(3)').text();
+        cy.get('dt').contains('CubeCart').closest('dl').then($frameworkVersion => {
+            var frameworkVersion = $frameworkVersion.children('dd:nth-child(2)').text();
             cy.wrap(frameworkVersion).as('frameworkVersion');
         });
 
-        /** Get shop version. */
-        cy.get('label[for="edit-modules-commerce-commerce-enable"]').closest('tr').then($shopVersion => {
-            var shopVersion = $shopVersion.children('td:nth-child(3)').text();
-            cy.wrap(shopVersion).as('shopVersion');
-        });
+        /** Go to plugins/modules page. */
+        cy.goToPage(this.PluginsPageAdminUrl);
 
         /** Get paylike version. */
-        cy.get('label[for="edit-modules-commerce-contrib-commerce-paylike-enable"]').closest('tr').then($paylikeVersion => {
+        cy.get(`input[id*=${this.PaylikeName}]`).closest('tr').then($paylikeVersion => {
             var paylikeVersion = $paylikeVersion.children('td:nth-child(3)').text();
             cy.wrap(paylikeVersion).as('paylikeVersion');
         });
 
         /** Get global variables and make log data request to remote url. */
         cy.get('@frameworkVersion').then(frameworkVersion => {
-            cy.get('@shopVersion').then(shopVersion => {
-                cy.get('@paylikeVersion').then(paylikeVersion => {
+            cy.get('@paylikeVersion').then(paylikeVersion => {
 
-                    cy.request('GET', this.RemoteVersionLogUrl, {
-                        key: shopVersion,
-                        tag: this.ShopName,
-                        view: 'html',
-                        framework: frameworkVersion,
-                        ecommerce: shopVersion,
-                        plugin: paylikeVersion
-                    }).then((resp) => {
-                        expect(resp.status).to.eq(200);
-                    });
+                cy.request('GET', this.RemoteVersionLogUrl, {
+                    key: frameworkVersion,
+                    tag: this.ShopName,
+                    view: 'html',
+                    // framework: frameworkVersion,
+                    ecommerce: frameworkVersion,
+                    plugin: paylikeVersion
+                }).then((resp) => {
+                    expect(resp.status).to.eq(200);
                 });
             });
         });
