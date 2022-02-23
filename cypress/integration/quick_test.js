@@ -46,14 +46,6 @@ describe('paylike plugin quick test', () => {
         TestMethods.processOrderFromAdmin('refund');
     });
 
-    /** Partial Capture */
-    TestMethods.payWithSelectedCurrency(currency, 'capture', /*partialAmount*/ true);
-
-    /** Refund last created order (previously captured). */
-    it('Process last order captured from admin panel to be refunded', () => {
-        TestMethods.processOrderFromAdmin('refund', /*partialAmount*/ true);
-    });
-
     /** Void */
     TestMethods.payWithSelectedCurrency(currency, 'void');
 
