@@ -11,8 +11,6 @@ Released under the GPL V3 license: https://opensource.org/licenses/GPL-3.0
 
 *The plugin has been tested with most versions of Cubecart at every iteration. We recommend using the latest version of Cubecart, but if that is not possible for some reason, test the plugin with your Cubecart version and it would probably function properly.*
 
-* The plugin has been tested with Cubecart up to version 6.4.4
-
 ## Installation
 
 Once you have installed Cubecart, follow these simple steps:
