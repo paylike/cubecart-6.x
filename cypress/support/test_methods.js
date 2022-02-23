@@ -12,18 +12,24 @@ export var TestMethods = {
     RemoteVersionLogUrl: Cypress.env('REMOTE_LOG_URL'),
 
     /** Construct some variables to be used bellow. */
-    ShopName: 'drupalcommerce7',
+    ShopName: 'cubecart',
     PaylikeName: 'paylike',
-    ShopAdminUrl: '/commerce/config/currency', // used for change currency
-    PaymentMethodsAdminUrl: '/commerce/config/payment-methods',
-    OrdersPageAdminUrl: '/commerce/orders',
-    ModulesAdminUrl: '/modules',
+    CheckoutUrl: '/index.php?_a=checkout',
+    // ShopAdminUrl: '/commerce/config/currency', // used for change currency
+    PaymentMethodsAdminUrl: '?_g=plugins&type=plugins&module=Paylike_Payments',
+    OrdersPageAdminUrl: '?_g=orders',
 
     /**
      * Login to admin backend account
      */
     loginIntoAdminBackend() {
-        cy.loginIntoAccount('input[name=name]', 'input[name=pass]', 'admin');
+        cy.loginIntoAccount('input[name=username]', 'input[name=password]', 'admin');
+    },
+    /**
+     * Login to client|user frontend account
+     */
+    loginIntoClientAccount() {
+        cy.loginIntoAccount('input[name=username]', 'input[name=password]', 'client');
     },
 
     /**
@@ -31,21 +37,13 @@ export var TestMethods = {
      * @param {String} captureMode
      */
     changePaylikeCaptureMode(captureMode) {
-        /** Go to payments page, and select Paylike. */
+        /** Go to Paylike payment method. */
         cy.goToPage(this.PaymentMethodsAdminUrl);
 
-        /** Select paylike & config its settings. */
-        cy.get(`a[href*=${this.PaylikeName}]`).click();
-        cy.get('.rules-element-label a').click();
+        /** Select capture mode. */
+        cy.selectOptionContaining('select[name="module[capturemode]"]', captureMode)
 
-        /** Change capture mode & save. */
-        if ('Instant' === captureMode) {
-            cy.get('input[id*=type-auth-capture]').click();
-        } else if ('Delayed' === captureMode) {
-            cy.get('input[id*=type-authorize]').click();
-        }
-
-        cy.get('#edit-submit').click();
+        cy.get('.form_control > input[name=save]').click();
     },
 
     /**
@@ -75,40 +73,30 @@ export var TestMethods = {
         /** Go to store frontend. */
         cy.goToPage(this.StoreUrl);
 
+        /** Change currency. */
+        this.changeShopCurrency(currency);
+
         /** Add to cart random product. */
         var randomInt = PaylikeTestHelper.getRandomInt(/*max*/ 1);
-        cy.get('.commerce-add-to-cart input[id*=edit-submit]').eq(randomInt).click();
+        cy.get('button[value="Add to Basket"]').eq(randomInt).click();
 
-        /** Go to cart. */
-        cy.get('.status  a').click();
-
-        /** Proceed to checkout. */
-        cy.get('#edit-checkout').click();
-
-        /** Fill in address fields. */
-        cy.get('input[id*=name-line]').clear().type('John Doe');
-        cy.get('input[id*=thoroughfare]').clear().type('Street no 1');
-        cy.get('input[id*=locality]').clear().type('City');
-
-        /** Next checkout step. */
-        cy.get('.checkout-continue.form-submit').click();
+        /** Go to checkout. */
+        cy.goToPage(this.StoreUrl + this.CheckoutUrl);
 
         /** Choose Paylike. */
-        cy.get(`.form-type-radio > input[id*=${this.PaylikeName}]`).click();
+        cy.get('input[id=Paylike_Payments]').click();
 
         /** Get & Verify amount. */
-        cy.get('.commerce-price-formatted-components .component-total').then(($totalAmount) => {
+        cy.get('#content_checkout_medium_up td').contains('Grand Total').next().then($grandTotal => {
             cy.window().then(win => {
-                var expectedAmount = PaylikeTestHelper.filterAndGetAmountInMinor($totalAmount, currency);
-                var orderTotalAmount = Number(win.Drupal.settings.commerce_paylike.config.amount.value);
+                var expectedAmount = PaylikeTestHelper.filterAndGetAmountInMinor($grandTotal, currency);
+                var orderTotalAmount = Number(win.cc_paylike_params.amount);
                 expect(expectedAmount).to.eq(orderTotalAmount);
             });
         });
 
-        cy.wait(500);
-
         /** Show paylike popup. */
-        cy.get('#edit-commerce-payment-payment-details-paylike-button').click();
+        cy.get('#checkout_proceed').click();
 
         /**
          * Fill in Paylike popup.
@@ -117,10 +105,7 @@ export var TestMethods = {
 
         cy.wait(500);
 
-        /** Go to order confirmation. */
-        cy.get('#edit-continue').click();
-
-        cy.get('h1#page-title').should('be.visible').contains('Checkout complete');
+        cy.get('.alert-box.success').should('contain', 'Payment has been received');
     },
 
     /**
@@ -186,16 +171,15 @@ export var TestMethods = {
     },
 
     /**
-     * Change shop currency from admin
+     * Change shop currency in frontend
      */
-    changeShopCurrencyFromAdmin(currency) {
-        it(`Change shop currency from admin to "${currency}"`, () => {
-            /** Go to edit shop page. */
-            cy.goToPage(this.ShopAdminUrl);
-
-            /** Select currency & save. */
-            cy.selectOptionContaining('#edit-commerce-default-currency', currency);
-            cy.get('#edit-submit').click();
+    changeShopCurrency(currency) {
+        cy.get('a[data-dropdown=currency-switch]').then($dropDownCurrencyButton => {
+            var currencyAlreadySelected = $dropDownCurrencyButton.text().includes(currency);
+            if (!currencyAlreadySelected) {
+                $dropDownCurrencyButton.trigger('click');
+                cy.get('#currency-switch a').contains(currency).click();
+            }
         });
     },
 
