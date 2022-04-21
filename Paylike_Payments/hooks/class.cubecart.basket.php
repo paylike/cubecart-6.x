@@ -44,7 +44,7 @@ if ($GLOBALS['session']->has('currency', 'client')) {
 }
 
 $paylikejs['test_mode'] = $modcfg['mode'];
-$paylikejs['title'] = $GLOBALS['config']->get('config','store_name');
+$paylikejs['title'] = $modcfg['paydescription'] ?? $GLOBALS['config']->get('config','store_name');
 $paylikejs['currency'] = $clientCurrency;
 $paylikejs['amount'] = (int)(get_paylike_amount($GLOBALS['cart']->getTotal(), $clientCurrency));
 $paylikejs['exponent'] = get_paylike_currency($clientCurrency)['exponent'];
