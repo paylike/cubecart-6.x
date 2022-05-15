@@ -158,6 +158,9 @@ if(isset($GLOBALS['_POST']['confirmplvoid'])&&$GLOBALS['_POST']['confirmplvoid']
         $newlog['notes'][] = $modlang['voided'];
         $GLOBALS['main']->successMessage($modlang['voided']);
         $newlog['status'] = 'Voided';
+
+        // set new status on order that has been voided
+        $order->orderStatus(Order::ORDER_CANCELLED, $record['cart_order_id']);
       }
 
       //save new log
@@ -236,6 +239,8 @@ if(isset($GLOBALS['_POST']['confirmplrefund'])&&$GLOBALS['_POST']['confirmplrefu
         $newlog['notes'][] = $modlang['refunded'];
         $GLOBALS['main']->successMessage($modlang['refunded']);
         $newlog['status'] = 'Refunded';
+
+        //@todo add new status for refund.
       }
 
       //save new log
