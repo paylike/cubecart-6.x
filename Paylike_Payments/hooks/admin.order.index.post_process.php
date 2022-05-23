@@ -240,7 +240,9 @@ if(isset($GLOBALS['_POST']['confirmplrefund'])&&$GLOBALS['_POST']['confirmplrefu
         $GLOBALS['main']->successMessage($modlang['refunded']);
         $newlog['status'] = 'Refunded';
 
-        //@todo add new status for refund.
+        // set new status on order that has been refunded
+        // 70 is an arbitrarily chosen order status ID, so as not to interfere with any other status.
+        $order->orderStatus(70, $record['cart_order_id']);
       }
 
       //save new log
