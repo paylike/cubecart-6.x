@@ -1,8 +1,10 @@
-jQuery(function ($) {
-    /**
-     * Object to handle Paylike payment forms.
-     */
-    var cc_paylike_form = {
+document.addEventListener('DOMContentLoaded', (e) => {
+
+    jQuery(function ($) {
+        /**
+         * Object to handle Paylike payment forms.
+         */
+        var cc_paylike_form = {
 
             /**
              * Initialize e handlers and UI state.
@@ -22,13 +24,13 @@ jQuery(function ($) {
 
                 // If this is a paylike submission (after modal) and token exists, allow submit.
                 if (cc_paylike_form.paylike_submit && token) {
-                  if (cc_paylike_form.form.find('input.paylike_token').val() !== '')
+                if (cc_paylike_form.form.find('input.paylike_token').val() !== '')
                     return false;
                 }
 
                 // If this is a paylike submission (after modal) and card exists, allow submit.
                 if (cc_paylike_form.paylike_submit && card) {
-                  if (cc_paylike_form.form.find('input.paylike_card_id').val() !== '')
+                if (cc_paylike_form.form.find('input.paylike_card_id').val() !== '')
                     return false;
                 }
 
@@ -167,18 +169,18 @@ jQuery(function ($) {
 
                     paylike.pay(args,
                         function (err, res) {
-                          if(err=='closed') { return false; }
-                          if (res.transaction) {
-                              var trxid = res.transaction.id;
-                              $form.find('input.paylike_token').remove();
-                              $form.append('<input type="hidden" class="paylike_token" name="paylike_token" value="' + trxid + '"/>');
-                          } else {
-                              var cardid = res.card.id;
-                              $form.find('input.paylike_card_id').remove();
-                              $form.append('<input type="hidden" class="paylike_card_id" name="paylike_card_id" value="' + cardid + '"/>');
-                          }
-                          cc_paylike_form.paylike_submit = true;
-                          $form.submit();
+                        if(err=='closed') { return false; }
+                        if (res.transaction) {
+                            var trxid = res.transaction.id;
+                            $form.find('input.paylike_token').remove();
+                            $form.append('<input type="hidden" class="paylike_token" name="paylike_token" value="' + trxid + '"/>');
+                        } else {
+                            var cardid = res.card.id;
+                            $form.find('input.paylike_card_id').remove();
+                            $form.append('<input type="hidden" class="paylike_card_id" name="paylike_card_id" value="' + cardid + '"/>');
+                        }
+                        cc_paylike_form.paylike_submit = true;
+                        $form.submit();
                         }
                     );
 
@@ -189,8 +191,9 @@ jQuery(function ($) {
             escapeQoutes:function(str) {
                 return str.toString().replace(/"/g, '\\"');
             }
-        }
-    ;
+        };
 
-    cc_paylike_form.init($("form#checkout_form"));
-});
+        cc_paylike_form.init($("form#checkout_form"));
+    });
+
+})
